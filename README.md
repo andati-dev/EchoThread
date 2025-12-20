@@ -1,4 +1,4 @@
-# Reddit Clone (Portfolio)
+# Reddit Clone
 
 A Reddit-style full-stack web app built as a portfolio project.
 
