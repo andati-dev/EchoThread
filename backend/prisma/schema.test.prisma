@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String?
+  password     String
+  posts        Post[]
+  comments     Comment[]
+  votes        Vote[]
+  commentVotes CommentVote[]
+  createdAt    DateTime      @default(now())
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  comments  Comment[]
+  votes     Vote[]
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  parent    Comment? @relation("CommentToComments", fields: [parentId], references: [id])
+  parentId  Int?
+  children  Comment[] @relation("CommentToComments")
+  votes     CommentVote[]
+  createdAt DateTime @default(now())
+}
+
+model CommentVote {
+  id        Int      @id @default(autoincrement())
+  value     Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  commentId Int
+
+  @@unique([authorId, commentId])
+}
+
+model Vote {
+  id        Int      @id @default(autoincrement())
+  value     Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+
+  @@unique([authorId, postId])
+}
